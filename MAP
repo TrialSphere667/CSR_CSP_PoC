@@ -1,0 +1,66 @@
+# Protocol → CSR Section Dependency Map
+
+**Purpose:** Track which protocol section(s) each CSR section/subsection derives from, the correspondence type, and grounding status. This is the schema underlying the section-to-source mapping node in the CSR protocol-driven drafting pipeline.
+
+**Status:** Template — populate one row per CSR subsection targeted for v1.
+
+---
+
+## How to use this template
+
+- One row = one CSR subsection (or table/data element within a subsection, if granularity requires it).
+- `Correspondence Type` drives downstream pipeline behavior — it's the signal for whether a section is a good v1 candidate or should be deferred.
+- `Grounding Default` is a *starting assumption* for how the pipeline should flag content from this mapping — not a guarantee; the grounding verification node still checks per-instance.
+- Leave `Protocol Locator` as specific as possible (section number + subsection, not just "Section 5") — this becomes the citation target for generated content.
+- Anything you can't confidently fill in, mark `Status = Open Question` rather than guessing.
+
+---
+
+## Column definitions
+
+| Column | Definition |
+|---|---|
+| **CSR Section #** | ICH E3 section/subsection number (e.g., 9.2) |
+| **CSR Section Title** | Human-readable title (e.g., "Inclusion and Exclusion Criteria") |
+| **Content Element** | Specific data point/statement/table within the section, if the section has multiple distinct derivable items |
+| **Protocol Locator** | Protocol section/subsection/table where source content lives |
+| **Correspondence Type** | `Direct` (near-verbatim transcription), `Derived` (source content requires transformation/aggregation but no judgment), `Synthesis` (requires narrative judgment — flag as v2+/human-first) |
+| **Grounding Default** | `Grounded` (expect direct traceability) or `Inferred` (expect the pipeline will need to fill a gap not explicitly stated) |
+| **v1 Candidate?** | Yes / No / Defer — based on Correspondence Type |
+| **Status** | `Confirmed` / `Draft` / `Open Question` |
+| **Notes** | Caveats, known ambiguity, dependency on other rows, etc. |
+
+---
+
+## Mapping table
+
+| CSR Section # | CSR Section Title | Content Element | Protocol Locator | Correspondence Type | Grounding Default | v1 Candidate? | Status | Notes |
+|---|---|---|---|---|---|---|---|---|
+| 9.1 | Study Population Overview | | | | | | | |
+| 9.2 | Inclusion Criteria | | | | | | | |
+| 9.3 | Exclusion Criteria | | | | | | | |
+| 8.1 | Overall Study Design | | | | | | | |
+| 8.2 | Treatment/Dosing Schema | | | | | | | |
+| | | | | | | | | |
+| | | | | | | | | |
+
+*(Add rows as needed — one row per CSR subsection or content element in scope.)*
+
+---
+
+## Example (filled, for reference — delete before use)
+
+| CSR Section # | CSR Section Title | Content Element | Protocol Locator | Correspondence Type | Grounding Default | v1 Candidate? | Status | Notes |
+|---|---|---|---|---|---|---|---|---|
+| 9.2 | Inclusion Criteria | Full criteria list | Protocol §4.1, Table 3 | Direct | Grounded | Yes | Confirmed | Near-verbatim; watch for numbering drift if protocol table is renumbered in amendments |
+| 8.2 | Treatment/Dosing Schema | Dose escalation rule | Protocol §5.3 | Derived | Grounded | Yes | Draft | Requires combining §5.3 text with dosing table; not a single-span citation |
+| 9.1 | Study Population Overview | Rationale for population choice | Protocol §4 (intro), various | Synthesis | Inferred | Defer | Open Question | Requires narrative judgment across scattered protocol content — v2+ candidate |
+
+---
+
+## Summary rollup (fill in once table is populated)
+
+- **Total CSR subsections mapped:** ___
+- **v1 candidates (Direct/Derived):** ___
+- **Deferred to v2+ (Synthesis):** ___
+- **Open questions outstanding:** ___
