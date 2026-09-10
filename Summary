@@ -1,0 +1,64 @@
+CSR Protocol-to-Section Population — Design Handoff
+Author: Adam, Regulatory Medical Writing
+Audience: Scribbler development team
+Status: Manual prompt chain, prototype. Steps 1–3 run on a live protocol. Step 4 authored, not yet run.
+1. What this does
+Generates CSR section content derived from a study protocol, with every generated statement traceable to a specific protocol location.
+The protocol is the only content source. A CSR file is used as a structural reference — to enumerate target sections — and is explicitly barred from acting as a source of content.
+2. The core problem
+Derivation fidelity. Every CSR statement must trace to a specific protocol locator, and content that is grounded (stated in the protocol) must be mechanically distinguishable from content that is inferred (required by the CSR but not present in the protocol).
+This is the property the pipeline lives or dies on. If automation preserves nothing else from this design, it must preserve this.
+3. The four steps
+Each step produces a verified artifact before the next begins. Each seam is a human sign-off gate.
+Step
+Input
+Output
+Status
+1. Dependency map
+Protocol + CSR (structure only)
+Table mapping each CSR section to its protocol locator, with correspondence type
+Run
+2. Verification
+Protocol + CSR + Step 1 map
+Independent re-derivation of each locator; agreement/disagreement per row; one recommended pilot section
+Run, map verified
+3. Extraction
+Protocol + verified map
+Provenance-tagged inventory of content items with Item ID anchors, precision flags, gaps
+Run
+4. Drafting
+Extraction inventory only
+Clean draft + annotated draft citing Item IDs + precision and coverage checks
+Not yet run
+Prompts are available as separate files.
+4. Design decisions automation must preserve
+Each of these exists because removing it breaks the audit chain.
+4.1 Drafting cannot see the protocol. Step 4 consumes the Step 3 inventory only. If drafting can reach the protocol, you cannot tell whether a sentence came from its cited item or from somewhere else — the provenance chain becomes unverifiable. Enforce this structurally: the drafting node should not receive the protocol at all, rather than be instructed not to use it.
+4.2 Every sentence cites Item IDs. Uncited sentences mean the model is composing rather than assembling. This is a hard gate, not a warning.
+4.3 Precision-critical values are checked mechanically. Numbers, units, thresholds, timepoints, and criterion identifiers are flagged at extraction and verified unchanged at drafting. Numeric drift is the failure with the highest regulatory consequence and the lowest chance of being caught by eye.
+4.4 Gaps stay visible. Where the CSR requires content the protocol does not state, emit an explicit placeholder for author decision. Never fill with plausible or conventional wording.
+4.5 Flags are carried forward, never resolved. Protocol ambiguity and internal inconsistency are surfaced to the human. The model does not choose an interpretation.
+4.6 Out-of-locator content is surfaced, not absorbed. Relevant content found outside the mapped locator is reported separately. It signals the dependency map needs refining — not that extraction should widen its scope.
+4.7 House style is a parameter. Tense and voice are supplied at run time. The model does not infer CSR convention.
+4.8 No auto-drafting of judgement-dependent content. Sections requiring clinical or narrative judgement are out of v1 scope and human-first.
+5. Known limitations
+Step 2 is not a blind verification. The Step 1 map is in context, so the model can anchor on it and rationalise agreement. Automation can fix this: give the verification node the protocol without the prior map, and compare programmatically afterwards.
+Validated on one section. Proves the chain works; does not establish that granularity or Item ID anchoring generalise across section types.
+Step 4 unrun. Its checks are designed, not demonstrated.
+No quantitative baseline. Locator accuracy, extraction recall, and precision-check pass rate are unmeasured.
+6. Proposed automation shape
+A starting point, not a specification.
+Predefined orchestration graph, not an open-ended agent loop.
+Nodes for steps 1–4, with state persisting the verified map and the extraction inventory between them.
+Non-waivable human sign-off gates at each seam.
+Per-section fan-out at extraction and drafting once the map is verified.
+Structured output at every node; no free-text hand-offs.
+Drafting node receives the inventory only — protocol excluded at the interface level.
+7. Open items
+Locator accuracy baseline — running Step 1 twice in separate sessions and diffing gives an independent signal the current Step 2 cannot.
+House style rules for tense and criterion formatting — required before Step 4 can run.
+Whether Item ID anchoring holds as ground truth for a pilot scoring harness.
+Whether extraction granularity generalises beyond the piloted section.
+Whether gates are enforced in the Scribbler UI or upstream in the pipeline.
+8. What I am asking for
+Review of §4 in particular. If any of those constraints is expensive to implement, I would rather discuss the trade-off than have it quietly relaxed. Each one exists to keep unverified content out of a regulated document.
